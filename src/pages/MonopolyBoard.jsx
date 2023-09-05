@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Phaser from "phaser";
-import BoardInfo from "./BoardInfo";
+import UserInfo from "./UserInfo";
+import UserTurn from "./UserTurn";
+import DiceRoll from "./DiceRoll";
 
 // 기본 값
 let pNum = 4; // Number of players
 let turn = 0; // Turn number
-let colorPalette = ["ff0000", "0000FF", "00FF00", "FFFF00"];
+let colorPalette = ["dd9090", "909add", "90dd9a", "dddc90"];
 const first_money = process.env.REACT_APP_FIRST_MONEY;
 const playerDeafaults = [];
 for (let i = 1; i <= pNum; i++) {
@@ -13,6 +15,7 @@ for (let i = 1; i <= pNum; i++) {
     name: `Player ${i}`,
     money: first_money, // first_money는 초기 돈 값입니다.
     color: colorPalette[i - 1],
+    position: (0, 0),
   });
 }
 
@@ -21,6 +24,9 @@ const MonopolyBoard = () => {
   const [dice2, setDice2Value] = useState(null);
   const [isRolling, setIsRolling] = useState(false); // 버튼 활성화 상태를 관리
   const [playerData] = useState(playerDeafaults);
+  const [players] = useState([]);
+  const [playersPositions] = useState([]);
+  const [isUserTurnVisible, setIsUserTurnVisible] = useState(false);
   useEffect(() => {
     const config = {
       type: Phaser.AUTO,
@@ -41,23 +47,24 @@ const MonopolyBoard = () => {
       [-6, 6],
       [6, 6],
     ];
-    let players = []; // Array of players
-    let playersPositions = []; // Array of players positions
-
     function preload() {
       this.load.image("tile", "path_to_tile_image.png"); // Load your tile image
+      this.load.image("sampleTile", "assets/Polygon3.png"); // Load your tile image
     }
 
     function create() {
       // Create Board
-      const tileSize = 64; // Assuming each tile is 64x64 pixels
-      for (let row = 0; row < 8; row++) {
-        for (let col = 0; col < 8; col++) {
-          if (row === 0 || col === 0 || row === 7 || col === 7) {
+      const tileSize = 81; // Assuming each tile is 64x64 pixels
+      for (let row = 0; row < 9; row++) {
+        for (let col = 0; col < 9; col++) {
+          if (row === 0 || col === 0 || row === 8 || col === 8) {
             // Border tiles
             const x = (col - row) * (tileSize / 2) + game.config.width / 2;
             const y = (col + row) * (tileSize / 4) + game.config.height / 2;
-            this.add.image(x, y, "tile").setOrigin(0.5, 0.5);
+            const sampleTile = this.add
+              .image(x, y, "sampleTile")
+              .setOrigin(0.5, 3);
+            sampleTile.setScale(0.5, 0.5); // scaleX와 scaleY를 원하는 크기로 설정하세요.
           }
         }
       }
@@ -66,7 +73,7 @@ const MonopolyBoard = () => {
       for (let i = 0; i < pNum; i++) {
         const player = this.add.circle(
           game.config.width / 2 + setPosition[i][0],
-          game.config.height / 2 + setPosition[i][1],
+          game.config.height / 2 + setPosition[i][1] - 100,
           tileSize / 10,
           parseInt(colorPalette[i], 16)
         );
@@ -76,18 +83,18 @@ const MonopolyBoard = () => {
           row: 0,
           col: 0,
           mx: setPosition[i][0],
-          my: setPosition[i][1],
+          my: setPosition[i][1] - 100,
         });
       }
     }
 
     // Function - Move Player in Board
     const movePlayer = (rowOffset, colOffset) => {
-      const tileSize = 64;
+      const tileSize = 81;
       const newRow = playersPositions[turn].row + rowOffset;
       const newCol = playersPositions[turn].col + colOffset;
 
-      if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
+      if (newRow >= 0 && newRow < 9 && newCol >= 0 && newCol < 9) {
         playersPositions[turn].row = newRow;
         playersPositions[turn].col = newCol;
         const x = (newCol - newRow) * (tileSize / 2) + game.config.width / 2;
@@ -115,19 +122,20 @@ const MonopolyBoard = () => {
 
       // Move Player
       for (let i = 0; i < TotalDice; i++) {
+        // eslint-disable-next-line no-loop-func
         setTimeout(() => {
           if (
             playersPositions[turn].row === 0 &&
-            playersPositions[turn].col < 7
+            playersPositions[turn].col < 8
           ) {
             movePlayer(0, 1);
           } else if (
-            playersPositions[turn].col === 7 &&
-            playersPositions[turn].row < 7
+            playersPositions[turn].col === 8 &&
+            playersPositions[turn].row < 8
           ) {
             movePlayer(1, 0);
           } else if (
-            playersPositions[turn].row === 7 &&
+            playersPositions[turn].row === 8 &&
             playersPositions[turn].col > 0
           ) {
             movePlayer(0, -1);
@@ -141,6 +149,7 @@ const MonopolyBoard = () => {
           if (i === TotalDice - 1) {
             // 이벤트가 끝날 때 버튼 다시 활성화
             setTimeout(() => {
+              setIsUserTurnVisible(true);
               setIsRolling(false);
               turn = (turn + 1) % pNum;
             }, 500);
@@ -154,8 +163,17 @@ const MonopolyBoard = () => {
 
   return (
     <div>
-      <BoardInfo playerData={playerData} turn={turn} />
-      <div id="game-container" />
+      <UserInfo playerData={playerData} turn={turn} />
+      {isUserTurnVisible && (
+        <UserTurn
+          position={playersPositions}
+          turn={turn}
+          close={setIsUserTurnVisible}
+          pNum={pNum}
+        />
+      )}
+      <DiceRoll />
+      <div id="game-container" className="GameScreen" />
       <button id="move-button" disabled={isRolling}>
         Roll Dice
       </button>

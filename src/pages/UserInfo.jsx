@@ -1,8 +1,8 @@
 // 보드판에 있는 칸에 대한 정보입니다.
 import React from "react";
-import "./BoardInfo.css";
+import "./UserInfo.css";
 
-function BoardInfo({ playerData, turn }) {
+function UserInfo({ playerData, turn }) {
   return (
     <>
       {/* Player Board */}
@@ -20,4 +20,4 @@ function BoardInfo({ playerData, turn }) {
     </>
   );
 }
-export default BoardInfo;
+export default UserInfo;
