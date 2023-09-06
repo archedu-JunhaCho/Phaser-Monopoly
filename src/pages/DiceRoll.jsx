@@ -1,29 +1,43 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./DiceRoll.css"; // CSS 파일을 import 해야 합니다.
 
-function DiceRoll() {
+function DiceRoll({ setDice1Value, setDice2Value, diceActive, dice1, dice2 }) {
   const [diceOneClass, setDiceOneClass] = useState("");
   const [diceTwoClass, setDiceTwoClass] = useState("");
-  const [rolling, setRolling] = useState(false);
-
+  // 실제 주사위 값 설정
   const rollDice = () => {
-    if (rolling) return; // 이미 굴리고 있는 중이면 중복 클릭 방지
-    const diceOne = Math.floor(Math.random() * 6) + 1;
-    const diceTwo = Math.floor(Math.random() * 6) + 1;
-
+    const diceOne = dice1;
+    const diceTwo = dice2;
     console.log(diceOne + " " + diceTwo);
-
     setDiceOneClass("show-" + diceOne);
     setDiceTwoClass("show-" + diceTwo);
-
-    setTimeout(() => {
-      setRolling(false); // 굴리기 완료 후 다시 클릭 가능하도록 설정
-    }, 1000);
   };
+  // 주사위 1,1 로 초기화
+  const rollDiceReset = () => {
+    setDiceOneClass("show-" + 1);
+    setDiceTwoClass("show-" + 1);
+  };
+  // 주사위 4,4로 한번 돌리기
+  const rollDiceReset2 = () => {
+    setDiceOneClass("show-" + 4);
+    setDiceTwoClass("show-" + 4);
+  };
+  useEffect(() => {
+    if (diceActive === true) {
+      console.log("DiceActive");
+      rollDiceReset();
+      setTimeout(() => {
+        rollDiceReset2();
+      }, 300);
+      setTimeout(() => {
+        rollDice();
+      }, 700);
+    }
+  }, [diceActive]);
 
   return (
-    <div className="diceRoll">
-      <div className="diceContainer">
+    <div className="diceContainer">
+      <div className="flexContainer">
         <div className="container">
           <div id="dice1" className={`dice dice-one ${diceOneClass}`}>
             <div id="dice-one-side-one" className="side one">
@@ -98,12 +112,12 @@ function DiceRoll() {
             </div>
           </div>
         </div>
-        <div id="roll" className="roll-button">
-          <button className="diceRollBtn" onClick={rollDice}>
-            주사위 굴리기
-          </button>
-        </div>
       </div>
+      {/* <div id="roll" className="roll-button">
+        <button className="diceRollBtn" onClick={rollDice}>
+          주사위 굴리기
+        </button>
+      </div> */}
     </div>
   );
 }

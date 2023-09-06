@@ -3,6 +3,7 @@ import Phaser from "phaser";
 import UserInfo from "./UserInfo";
 import UserTurn from "./UserTurn";
 import DiceRoll from "./DiceRoll";
+import "./Monopoly.css";
 
 // 기본 값
 let pNum = 4; // Number of players
@@ -22,6 +23,7 @@ for (let i = 1; i <= pNum; i++) {
 const MonopolyBoard = () => {
   const [dice1, setDice1Value] = useState(null);
   const [dice2, setDice2Value] = useState(null);
+  const [diceActive, setDiceActive] = useState(false);
   const [isRolling, setIsRolling] = useState(false); // 버튼 활성화 상태를 관리
   const [playerData] = useState(playerDeafaults);
   const [players] = useState([]);
@@ -30,9 +32,12 @@ const MonopolyBoard = () => {
   useEffect(() => {
     const config = {
       type: Phaser.AUTO,
-      parent: "game-container",
-      width: window.innerWidth,
-      height: window.innerHeight * 0.9,
+      scale: {
+        mode: Phaser.Scale.FIT,
+        parent: "game-container",
+        width: window.innerWidth,
+        height: window.innerHeight * 1,
+      },
       scene: {
         preload: preload,
         create: create,
@@ -105,22 +110,7 @@ const MonopolyBoard = () => {
         );
       }
     };
-
-    document.getElementById("move-button").addEventListener("click", () => {
-      if (isRolling) return; // 이미 굴리는 중이면 무시
-      setIsRolling(true); // 굴리는 중으로 설정
-      // Dice Roll
-      const Dice1 = Math.floor(Math.random() * 6) + 1;
-      const Dice2 = Math.floor(Math.random() * 6) + 1;
-      setDice1Value(Dice1);
-      setDice2Value(Dice2);
-      const TotalDice = Dice1 + Dice2;
-      console.log("주사위 눈금은", Dice1, Dice2);
-
-      // Select Player
-      console.log("이동할 플레이어는", turn);
-
-      // Move Player
+    const forMovePlayer = (TotalDice) => {
       for (let i = 0; i < TotalDice; i++) {
         // eslint-disable-next-line no-loop-func
         setTimeout(() => {
@@ -156,6 +146,25 @@ const MonopolyBoard = () => {
           }
         }, i * 200);
       }
+    };
+
+    document.getElementById("move-button").addEventListener("click", () => {
+      if (isRolling) return; // 이미 굴리는 중이면 무시
+      setIsRolling(true); // 굴리는 중으로 설정
+      // Dice Roll
+      const Dice1 = Math.floor(Math.random() * 6) + 1;
+      const Dice2 = Math.floor(Math.random() * 6) + 1;
+      setDice1Value(Dice1);
+      setDice2Value(Dice2);
+
+      setDiceActive(true);
+      const TotalDice = Dice1 + Dice2;
+
+      // Move Player
+      setTimeout(() => {
+        forMovePlayer(TotalDice);
+        setDiceActive(false);
+      }, 2000);
 
       console.log(turn, "의 턴입니다.");
     });
@@ -172,14 +181,19 @@ const MonopolyBoard = () => {
           pNum={pNum}
         />
       )}
-      <DiceRoll />
-      <div id="game-container" className="GameScreen" />
-      <button id="move-button" disabled={isRolling}>
-        Roll Dice
-      </button>
-      <div>
-        주사위 눈금 : {dice1},{dice2}
+      <div className="diceContainer">
+        <DiceRoll
+          setDice1Value={setDice1Value}
+          setDice2Value={setDice2Value}
+          diceActive={diceActive}
+          dice1={dice1}
+          dice2={dice2}
+        />
+        <button id="move-button" className="rollDiceBtn">
+          주사위 굴리기
+        </button>
       </div>
+      <div id="game-container" className="GameScreen" />
     </div>
   );
 };

@@ -22,15 +22,18 @@
 .diceContainer {
   position: fixed;
   width: auto;
-  /* height: 100%; */
   width: 100%;
-  /* left: 33vw; */
-  top: 40vh;
-  background-color: #d90429;
+  top: 45vh;
+  /* background-color: #d90429; */
 }
-
+.flexContainer {
+  display: flex;
+  width: 350px;
+  margin: auto;
+  margin-bottom: 5vh;
+}
 .container {
-  position: relative;
+  /* position: relative; */
   /* display: inline-block; */
   top: 80px;
   margin: auto;
@@ -55,13 +58,13 @@
 }
 
 .dice-one {
-  position: absolute;
-  left: 150px;
+  /* position: relative; */
+  /* left: 150px; */
 }
 
 .dice-two {
-  position: absolute;
-  left: -50px;
+  /* position: relative; */
+  /* left: -50px; */
 }
 
 .side {
@@ -76,27 +79,27 @@
 }
 
 .side:nth-child(1) {
-  transform: translateZ(3.1em);
-}
-
-.side:nth-child(6) {
-  transform: rotateY(90deg) translateZ(3.1em);
+  transform: translateZ(2.5em);
 }
 
 .side:nth-child(3) {
-  transform: rotateY(-90deg) translateZ(3.1em);
+  transform: rotateY(90deg) translateZ(2.5em);
 }
 
 .side:nth-child(4) {
-  transform: rotateX(90deg) translateZ(3.1em);
+  transform: rotateY(-90deg) translateZ(2.5em);
 }
 
 .side:nth-child(5) {
-  transform: rotateX(-90deg) translateZ(3.1em);
+  transform: rotateX(90deg) translateZ(2.5em);
 }
 
 .side:nth-child(2) {
-  transform: rotateY(-180deg) translateZ(3.1em);
+  transform: rotateX(-90deg) translateZ(2.5em);
+}
+
+.side:nth-child(6) {
+  transform: rotateY(-180deg) translateZ(2.5em);
 }
 
 .show-1 {
