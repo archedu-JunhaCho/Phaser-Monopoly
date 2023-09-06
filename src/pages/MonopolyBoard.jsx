@@ -4,7 +4,6 @@ import UserInfo from "./UserInfo";
 import UserTurn from "./UserTurn";
 import DiceRoll from "./DiceRoll";
 import "./Monopoly.css";
-
 // 기본 값
 let pNum = 4; // Number of players
 let turn = 0; // Turn number
@@ -19,7 +18,6 @@ for (let i = 1; i <= pNum; i++) {
     position: (0, 0),
   });
 }
-
 const MonopolyBoard = () => {
   const [dice1, setDice1Value] = useState(null);
   const [dice2, setDice2Value] = useState(null);
@@ -43,7 +41,6 @@ const MonopolyBoard = () => {
         create: create,
       },
     };
-
     const game = new Phaser.Game(config);
     // Game Settings
     let setPosition = [
@@ -55,8 +52,14 @@ const MonopolyBoard = () => {
     function preload() {
       this.load.image("tile", "path_to_tile_image.png"); // Load your tile image
       this.load.image("sampleTile", "assets/Polygon3.png"); // Load your tile image
+      // this.load.image("sampleTile", "assets/green_tile.png"); // Load your tile image
+      this.load.image("sampleBuilding", "assets/building.png"); // Load your building image
+      this.load.image("sampleShop", "assets/shop.png"); // Load your shop image
+      this.load.image("Blue", "assets/alienBlue.png");
+      this.load.image("Green", "assets/alienGreen.png");
+      this.load.image("Pink", "assets/alienPink.png");
+      this.load.image("Yellow", "assets/alienYellow.png");
     }
-
     function create() {
       // Create Board
       const tileSize = 81; // Assuming each tile is 64x64 pixels
@@ -70,19 +73,39 @@ const MonopolyBoard = () => {
               .image(x, y, "sampleTile")
               .setOrigin(0.5, 3);
             sampleTile.setScale(0.5, 0.5); // scaleX와 scaleY를 원하는 크기로 설정하세요.
+            // // 타일
+            // const sampleTile = this.add
+            //   .image(x, y, "sampleTile")
+            //   .setOrigin(0.5, 1.1);
+            // sampleTile.setScale(1.2, 1.2); // scaleX와 scaleY를 원하는 크기로 설정하세요.
+            // 샵
+            const sampleBuilding = this.add
+              .image(x, y, "sampleBuilding")
+              .setOrigin(0.8, 5.8);
+            sampleBuilding.setScale(0.125, 0.125); // scaleX와 scaleY를 원하는 크기로 설정하세요.
+            // 빌딩
+            const sampleShop = this.add
+              .image(x, y, "sampleShop")
+              .setOrigin(1.1, 6.2);
+            sampleShop.setScale(0.2, 0.2); // scaleX와 scaleY를 원하는 크기로 설정하세요.
           }
         }
       }
-
+      const Players = ["Blue", "Green", "Pink", "Yellow"];
       // Create Players dynamically
       for (let i = 0; i < pNum; i++) {
-        const player = this.add.circle(
+        // const player = this.add.circle(
+        //   game.config.width / 2 + setPosition[i][0],
+        //   game.config.height / 2 + setPosition[i][1] - 100,
+        //   tileSize / 10,
+        //   parseInt(colorPalette[i], 16)
+        // );
+        const player = this.add.image(
           game.config.width / 2 + setPosition[i][0],
           game.config.height / 2 + setPosition[i][1] - 100,
-          tileSize / 10,
-          parseInt(colorPalette[i], 16)
+          Players[i]
         );
-
+        player.setScale(0.5, 0.5);
         players.push(player);
         playersPositions.push({
           row: 0,
@@ -92,13 +115,11 @@ const MonopolyBoard = () => {
         });
       }
     }
-
     // Function - Move Player in Board
     const movePlayer = (rowOffset, colOffset) => {
       const tileSize = 81;
       const newRow = playersPositions[turn].row + rowOffset;
       const newCol = playersPositions[turn].col + colOffset;
-
       if (newRow >= 0 && newRow < 9 && newCol >= 0 && newCol < 9) {
         playersPositions[turn].row = newRow;
         playersPositions[turn].col = newCol;
@@ -147,7 +168,6 @@ const MonopolyBoard = () => {
         }, i * 200);
       }
     };
-
     document.getElementById("move-button").addEventListener("click", () => {
       if (isRolling) return; // 이미 굴리는 중이면 무시
       setIsRolling(true); // 굴리는 중으로 설정
@@ -156,20 +176,16 @@ const MonopolyBoard = () => {
       const Dice2 = Math.floor(Math.random() * 6) + 1;
       setDice1Value(Dice1);
       setDice2Value(Dice2);
-
       setDiceActive(true);
       const TotalDice = Dice1 + Dice2;
-
       // Move Player
       setTimeout(() => {
         forMovePlayer(TotalDice);
         setDiceActive(false);
       }, 2000);
-
       console.log(turn, "의 턴입니다.");
     });
   }, []);
-
   return (
     <div>
       <UserInfo playerData={playerData} turn={turn} />
@@ -197,5 +213,4 @@ const MonopolyBoard = () => {
     </div>
   );
 };
-
 export default MonopolyBoard;
